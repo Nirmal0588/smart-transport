@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Smart Transport – Fleet Manager</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eceeea;--panel:#fff;--ink:#16262b;--mute:#5d6e72;--line:#d5dad6;--teal:#0e6b6b;--amber:#e3a008;--red:#c2412d;--green:#2f7d4f;--tint:#f4f6f3;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10191c;--panel:#18262a;--ink:#e6eeec;--mute:#93a6a8;--line:#2b3d41;--teal:#3fb5b0;--amber:#f0b429;--red:#ef7b66;--green:#58b87c;--tint:#1d2d31}}
+:root[data-theme="dark"]{--bg:#10191c;--panel:#18262a;--ink:#e6eeec;--mute:#93a6a8;--line:#2b3d41;--teal:#3fb5b0;--amber:#f0b429;--red:#ef7b66;--green:#58b87c;--tint:#1d2d31}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Barlow,system-ui,sans-serif}
+h1,h2,h3{font-family:'Barlow Condensed',Impact,sans-serif;margin:0;letter-spacing:.01em}
+header{background:var(--ink);color:var(--bg);padding:14px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+header h1{font-size:26px}header small{opacity:.7}
+.stripe{height:6px;background:repeating-linear-gradient(135deg,var(--amber) 0 14px,var(--ink) 14px 28px)}
+nav{display:flex;gap:4px;padding:10px 20px 0;overflow-x:auto;border-bottom:1px solid var(--line);background:var(--panel)}
+nav button{border:0;background:none;color:var(--mute);font:600 15px Barlow,sans-serif;padding:10px 14px;border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap}
+nav button.on{color:var(--ink);border-color:var(--amber)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+main{max-width:1100px;margin:0 auto;padding:20px}
+.bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:10px;flex-wrap:wrap}
+.bar h2{font-size:28px}
+.btn{background:var(--teal);color:#fff;border:0;border-radius:4px;padding:8px 14px;font:600 14px Barlow,sans-serif;cursor:pointer}
+.btn.ghost{background:none;color:var(--ink);border:1px solid var(--line)}
+.btn.sm{padding:3px 9px;font-size:13px}.btn.del{background:none;color:var(--red);border:1px solid var(--line)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:20px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-left:5px solid var(--teal);padding:12px 14px;border-radius:4px}
+.kpi:nth-child(2){border-left-color:var(--amber)}.kpi:nth-child(3){border-left-color:var(--green)}.kpi:nth-child(4){border-left-color:var(--red)}
+.kpi b{display:block;font:700 34px/1.1 'Barlow Condensed',sans-serif}.kpi span{color:var(--mute);font-size:13px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:760px){.grid2{grid-template-columns:1fr}main{padding:14px}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:14px 16px}
+.panel h3{font-size:20px;margin-bottom:8px}
+.wrap{overflow-x:auto;background:var(--panel);border:1px solid var(--line);border-radius:4px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{background:var(--tint);color:var(--mute);font-weight:600;font-size:13px}
+td.act{text-align:right}td.act button{margin-left:4px}
+.tag{display:inline-block;padding:1px 9px;border-radius:99px;font-size:12px;font-weight:600;color:#fff;background:var(--green)}
+.tag.warn{background:var(--amber);color:#2a1d00}.tag.bad{background:var(--red);color:#fff}
+.alert{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.alert:last-child{border:0}.empty{color:var(--mute);padding:18px;text-align:center}
+dialog{border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--ink);padding:20px;width:min(440px,92vw)}
+dialog::backdrop{background:rgba(0,0,0,.5)}
+label{display:block;font-size:13px;color:var(--mute);margin:10px 0 3px}
+input,select{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:4px;background:var(--bg);color:var(--ink);font:15px Barlow,sans-serif}
+.row{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}
+svg text{fill:var(--mute);font:12px Barlow,sans-serif}
+</style>
+</head>
+<body>
+<header><h1>Smart Transport</h1><small>Maintenance, fuel and driver management</small>
+<button class="btn ghost" style="margin-left:auto;color:var(--bg);border-color:#ffffff55" id="reset">Reset demo data</button></header>
+<div class="stripe"></div>
+<nav id="nav"></nav>
+<main id="main"></main>
+<dialog id="dlg"><form id="frm" method="dialog"><h2 id="dt"></h2><div id="df"></div>
+<div class="row"><button type="button" class="btn ghost" id="cx">Cancel</button><button type="submit" class="btn" id="sv">Save</button></div></form></dialog>
+
+<script>
+const K='smart-transport-v1', $=s=>document.querySelector(s);
+const dt=n=>{const x=new Date();x.setDate(x.getDate()+n);return x.toISOString().slice(0,10)};
+const today=dt(0), money=n=>'₹'+Math.round(n).toLocaleString('en-IN');
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const uid=()=>Math.random().toString(36).slice(2,9);
+function seed(){
+ const dr=[{id:'d1',name:'Ravi Kumar',phone:'98430 11122',license:'TN37 2019 0045821',expiry:dt(210)},
+  {id:'d2',name:'Meena Devi',phone:'97900 55671',license:'TN38 2016 0098123',expiry:dt(18)},
+  {id:'d3',name:'Arun Prakash',phone:'99521 88340',license:'TN37 2021 0011790',expiry:dt(-12)}];
+ const ve=[{id:'v1',reg:'TN 37 AB 1024',model:'Tata Ace Gold',type:'Mini truck',odo:48200,every:5000,driver:'d1'},
+  {id:'v2',reg:'TN 38 CD 7781',model:'Ashok Leyland Dost',type:'Truck',odo:86400,every:8000,driver:'d2'},
+  {id:'v3',reg:'TN 66 EF 3302',model:'Force Traveller',type:'Passenger van',odo:121900,every:10000,driver:'d3'}];
+ const fu=[],mt=[];
+ [[ 'v1',[[-80,44100,28],[-55,45300,30],[-30,46700,31],[-8,48200,29]],12.5],['v2',[[-75,80900,52],[-48,82800,58],[-25,84700,56],[-5,86400,50]],8.4],['v3',[[-70,116200,60],[-45,118300,62],[-20,120200,58],[-3,121900,55]],9.1]]
+  .forEach(([v,rows])=>rows.forEach(r=>fu.push({id:uid(),vehicle:v,date:dt(r[0]),odo:r[1],litres:r[2],cost:r[2]*(102+Math.round(Math.random()*4))})));
+ mt.push({id:uid(),vehicle:'v1',date:dt(-120),type:'Oil change',odo:43500,cost:3200,next:dt(60),notes:'Engine oil and filter'},
+  {id:uid(),vehicle:'v2',date:dt(-90),type:'Brake service',odo:80000,cost:9800,next:dt(5),notes:'Front pads replaced'},
+  {id:uid(),vehicle:'v3',date:dt(-200),type:'General service',odo:111000,cost:14500,next:dt(-3),notes:'Full inspection'});
+ return{drivers:dr,vehicles:ve,fuel:fu,maint:mt};
+}
+let S=null;try{S=JSON.parse(localStorage.getItem(K))}catch(e){}
+if(!S||!S.vehicles)S=seed();
+const save=()=>{try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}};
+
+const veh=id=>S.vehicles.find(v=>v.id===id), drv=id=>S.drivers.find(d=>d.id===id);
+const vName=id=>veh(id)?.reg||'—', dName=id=>drv(id)?.name||'Unassigned';
+const odo=v=>Math.max(+v.odo||0,...S.fuel.filter(f=>f.vehicle===v.id).map(f=>+f.odo),...S.maint.filter(m=>m.vehicle===v.id).map(m=>+m.odo));
+const lastSvc=v=>Math.max(0,...S.maint.filter(m=>m.vehicle===v.id).map(m=>+m.odo));
+function kmpl(v){const f=S.fuel.filter(x=>x.vehicle===v.id).sort((a,b)=>a.odo-b.odo);
+ if(f.length<2)return null;const km=f[f.length-1].odo-f[0].odo;const l=f.slice(1).reduce((s,x)=>s+ +x.litres,0);return l?km/l:null}
+function svcState(v){const left=lastSvc(v)+ +v.every-odo(v);return left<=0?['bad','Overdue by '+(-left)+' km']:left<=500?['warn','Due in '+left+' km']:['ok',left+' km left']}
+function dayState(date){const n=Math.round((new Date(date)-new Date(today))/864e5);return n<0?['bad','Expired '+(-n)+' d ago']:n<=30?['warn','In '+n+' days']:['ok','In '+n+' days']}
+const tag=([c,t])=>`<span class="tag ${c==='ok'?'':c}">${esc(t)}</span>`;
+
+const opt=(arr,label)=>arr.map(x=>[x.id,label(x)]);
+const CFG={
+ vehicles:{t:'Vehicle',title:'Vehicles',fields:()=>[['reg','Registration number','text'],['model','Make and model','text'],['type','Type','select',[['Mini truck','Mini truck'],['Truck','Truck'],['Passenger van','Passenger van'],['Car','Car'],['Bus','Bus']]],['odo','Current odometer (km)','number'],['every','Service interval (km)','number'],['driver','Assigned driver','select',[['','Unassigned'],...opt(S.drivers,d=>d.name)]]],
+  cols:[['Vehicle',v=>`<b>${esc(v.reg)}</b><br><small>${esc(v.model)}</small>`],['Type',v=>esc(v.type)],['Driver',v=>esc(dName(v.driver))],['Odometer',v=>odo(v).toLocaleString('en-IN')+' km'],['Mileage',v=>kmpl(v)?kmpl(v).toFixed(1)+' km/l':'—'],['Service',v=>tag(svcState(v))]]},
+ fuel:{t:'Fuel entry',title:'Fuel log',fields:()=>[['vehicle','Vehicle','select',opt(S.vehicles,v=>v.reg)],['date','Date','date'],['odo','Odometer (km)','number'],['litres','Litres','number','0.01'],['cost','Total cost (₹)','number','0.01']],
+  cols:[['Date',f=>f.date],['Vehicle',f=>esc(vName(f.vehicle))],['Odometer',f=>(+f.odo).toLocaleString('en-IN')],['Litres',f=>(+f.litres).toFixed(1)],['Cost',f=>money(f.cost)],['₹ / litre',f=>(f.cost/f.litres).toFixed(2)]],sort:'date'},
+ maint:{t:'Maintenance record',title:'Maintenance',fields:()=>[['vehicle','Vehicle','select',opt(S.vehicles,v=>v.reg)],['date','Date','date'],['type','Work done','select',[['Oil change','Oil change'],['General service','General service'],['Brake service','Brake service'],['Tyre change','Tyre change'],['Battery','Battery'],['Repair','Repair'],['Insurance / FC','Insurance / FC']]],['odo','Odometer (km)','number'],['cost','Cost (₹)','number'],['next','Next due date','date'],['notes','Notes','text']],
+  cols:[['Date',m=>m.date],['Vehicle',m=>esc(vName(m.vehicle))],['Work',m=>esc(m.type)],['Odometer',m=>(+m.odo).toLocaleString('en-IN')],['Cost',m=>money(m.cost)],['Next due',m=>m.next?tag(dayState(m.next)):'—'],['Notes',m=>esc(m.notes)]],sort:'date'},
+ drivers:{t:'Driver',title:'Drivers',fields:()=>[['name','Full name','text'],['phone','Phone','text'],['license','Licence number','text'],['expiry','Licence expiry','date']],
+  cols:[['Driver',d=>`<b>${esc(d.name)}</b>`],['Phone',d=>esc(d.phone)],['Licence',d=>esc(d.license)],['Expiry',d=>d.expiry+' '+tag(dayState(d.expiry))],['Vehicle',d=>esc(S.vehicles.filter(v=>v.driver===d.id).map(v=>v.reg).join(', ')||'—')]]}
+};
+const store={vehicles:'vehicles',fuel:'fuel',maint:'maint',drivers:'drivers'};
+let tab='overview';
+const TABS=[['overview','Overview'],['vehicles','Vehicles'],['fuel','Fuel'],['maint','Maintenance'],['drivers','Drivers']];
+
+function renderNav(){$('#nav').innerHTML=TABS.map(([k,l])=>`<button class="${k===tab?'on':''}" data-t="${k}">${l}</button>`).join('')}
+$('#nav').onclick=e=>{const k=e.target.dataset.t;if(k){tab=k;render()}};
+
+function monthly(){const out=[];for(let i=5;i>=0;i--){const d=new Date();d.setDate(1);d.setMonth(d.getMonth()-i);const key=d.toISOString().slice(0,7);
+ out.push({m:d.toLocaleString('en',{month:'short'}),fuel:S.fuel.filter(f=>f.date.startsWith(key)).reduce((s,f)=>s+ +f.cost,0),mt:S.maint.filter(f=>f.date.startsWith(key)).reduce((s,f)=>s+ +f.cost,0)})}return out}
+function chart(){const d=monthly(),max=Math.max(1,...d.flatMap(x=>[x.fuel,x.mt])),W=520,H=200,bw=22;
+ let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Fuel and maintenance cost by month">`;
+ d.forEach((x,i)=>{const cx=30+i*84,h1=x.fuel/max*150,h2=x.mt/max*150;
+  s+=`<rect x="${cx}" y="${170-h1}" width="${bw}" height="${h1}" fill="var(--teal)"/><rect x="${cx+bw+3}" y="${170-h2}" width="${bw}" height="${h2}" fill="var(--amber)"/><text x="${cx+bw}" y="190" text-anchor="middle">${x.m}</text>`;
+  if(x.fuel)s+=`<text x="${cx+bw/2}" y="${165-h1}" text-anchor="middle">${Math.round(x.fuel/1000)}k</text>`});
+ return s+`</svg><div style="font-size:13px;color:var(--mute)"><span style="color:var(--teal)">■</span> Fuel &nbsp; <span style="color:var(--amber)">■</span> Maintenance (₹ thousands)</div>`}
+
+function alerts(){const a=[];
+ S.vehicles.forEach(v=>{const s=svcState(v);if(s[0]!=='ok')a.push([s[0],`${v.reg}: service ${s[1].toLowerCase()}`])});
+ S.maint.filter(m=>m.next&&dayState(m.next)[0]!=='ok'&&!S.maint.some(n=>n.vehicle===m.vehicle&&n.date>m.date)).forEach(m=>{const s=dayState(m.next);if(s[0]!=='ok'&&Math.round((new Date(m.next)-new Date(today))/864e5)<=14)a.push([s[0],`${vName(m.vehicle)}: ${m.type.toLowerCase()} follow-up ${s[1].toLowerCase()}`])});
+ S.drivers.forEach(d=>{const s=dayState(d.expiry);if(s[0]!=='ok')a.push([s[0],`${d.name}: licence ${s[1].toLowerCase()}`])});
+ return a.sort((x,y)=>x[0]==='bad'?-1:y[0]==='bad'?1:0)}
+
+function overview(){
+ const mk=today.slice(0,7),fm=S.fuel.filter(f=>f.date.startsWith(mk)),al=alerts();
+ const ks=S.vehicles.map(kmpl).filter(Boolean),avg=ks.length?ks.reduce((a,b)=>a+b)/ks.length:0;
+ return `<div class="bar"><h2>Fleet overview</h2></div>
+ <div class="kpis"><div class="kpi"><b>${S.vehicles.length}</b><span>Vehicles · ${S.drivers.length} drivers</span></div>
+ <div class="kpi"><b>${money(fm.reduce((s,f)=>s+ +f.cost,0))}</b><span>Fuel spend this month</span></div>
+ <div class="kpi"><b>${avg?avg.toFixed(1):'—'}</b><span>Average km per litre</span></div>
+ <div class="kpi"><b>${al.length}</b><span>Items needing attention</span></div></div>
+ <div class="grid2"><div class="panel"><h3>Needs attention</h3>${al.length?al.map(([c,t])=>`<div class="alert">${tag([c,c==='bad'?'Urgent':'Soon'])}<span>${esc(t)}</span></div>`).join(''):'<div class="empty">Nothing is due. Your fleet is up to date.</div>'}</div>
+ <div class="panel"><h3>Monthly costs</h3>${chart()}</div></div>`}
+
+function listView(k){const c=CFG[k];let rows=[...S[k]];if(c.sort)rows.sort((a,b)=>b[c.sort].localeCompare(a[c.sort]));
+ return `<div class="bar"><h2>${c.title}</h2><button class="btn" data-add="${k}">Add ${c.t.toLowerCase()}</button></div>
+ <div class="wrap">${rows.length?`<table><thead><tr>${c.cols.map(x=>`<th>${x[0]}</th>`).join('')}<th></th></tr></thead><tbody>${rows.map(r=>`<tr>${c.cols.map(x=>`<td>${x[1](r)}</td>`).join('')}<td class="act"><button class="btn ghost sm" data-edit="${k}:${r.id}">Edit</button><button class="btn del sm" data-del="${k}:${r.id}">Delete</button></td></tr>`).join('')}</tbody></table>`:`<div class="empty">No ${c.title.toLowerCase()} yet. Add the first one.</div>`}</div>`}
+
+function render(){renderNav();$('#main').innerHTML=tab==='overview'?overview():listView(tab)}
+
+const dlg=$('#dlg');let cur=null;
+function openForm(k,id){const c=CFG[k],rec=id?S[k].find(r=>r.id===id):{};cur={k,id};
+ $('#dt').textContent=(id?'Edit ':'Add ')+c.t.toLowerCase();
+ $('#df').innerHTML=c.fields().map(([f,l,t,o])=>{const v=rec[f]??(t==='date'?today:'');
+  return `<label for="f_${f}">${l}</label>`+(t==='select'?`<select id="f_${f}" name="${f}">${o.map(([a,b])=>`<option value="${esc(a)}"${a===v?' selected':''}>${esc(b)}</option>`).join('')}</select>`:`<input id="f_${f}" name="${f}" type="${t}" value="${esc(v)}" ${t==='number'?`step="${o||1}" min="0"`:''} ${f==='next'||f==='notes'||f==='phone'?'':'required'}>`)}).join('');
+ dlg.showModal()}
+$('#cx').onclick=()=>dlg.close();
+$('#frm').onsubmit=e=>{e.preventDefault();const {k,id}=cur,data=Object.fromEntries(new FormData($('#frm')));
+ if(id)Object.assign(S[k].find(r=>r.id===id),data);else S[k].push({id:uid(),...data});
+ save();dlg.close();render()};
+$('#main').onclick=e=>{const t=e.target;
+ if(t.dataset.add)openForm(t.dataset.add);
+ if(t.dataset.edit){const[k,id]=t.dataset.edit.split(':');openForm(k,id)}
+ if(t.dataset.del){const[k,id]=t.dataset.del.split(':');if(confirm('Delete this '+CFG[k].t.toLowerCase()+'?')){S[k]=S[k].filter(r=>r.id!==id);save();render()}}};
+$('#reset').onclick=()=>{if(confirm('Replace all data with the demo fleet?')){S=seed();save();render()}};
+render();
+</script>
+</body>
+</html>
